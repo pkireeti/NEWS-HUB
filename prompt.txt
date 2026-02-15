@@ -1,0 +1,43 @@
+Build a **professional AI-powered news web app frontend** with the following features:
+
+1. **Theme & Design:**
+   - Black and white theme (minimalistic, high-contrast, professional).
+   - Subtle animations for loading news cards, hover effects, and smooth scrolling.
+   - Fully responsive for desktop, tablet, and mobile.
+
+2. **News Display:**
+   - Show a list/grid of news articles with:
+     - Headline
+     - Short summary
+     - Thumbnail image
+     - Publication date
+   - Include filtering by categories (Technology, Business, Science, World, Trending).
+   - Include a search bar to search news by keyword.
+   - "Read More" button opens full news in a modal or new tab.
+
+3. **Email Subscription Form:**
+   - Simple subscription form for email input and submit button.
+   - Form must match black and white theme with subtle animation on hover and submit.
+   - No backend functionality required (just frontend layout and validation).
+
+4. **UI Components & Animations:**
+   - Animated news cards (fade-in or slide-in effect).
+   - Sticky header with logo and navigation.
+   - Smooth scroll for sections.
+   - Modal/pop-up for "Read More" news content.
+
+5. **Extra Styling:**
+   - Clean typography and spacing.
+   - Hover and focus effects consistent with professional black-and-white theme.
+   - Subtle transitions for buttons, cards, and modals.
+
+6. **Tech Stack:**
+   - Frontend: React + TailwindCSS (or plain HTML/CSS/JS if preferred).
+   - Include placeholder JSON data for news articles to render dynamically.
+   - No backend or database integration needed.
+
+**Output Expected from AI:**
+- Fully functional frontend code (React/TailwindCSS or HTML/CSS/JS).
+- Animated black-and-white UI with sample news articles.
+- Ready to test in browser.
+http://localhost:5173/

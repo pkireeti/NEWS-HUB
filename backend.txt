@@ -1,0 +1,34 @@
+Build a simple professional backend for an AI-powered news web app with the following features:
+
+1. **Core Functionality:**
+   - Accept email subscriptions from the frontend.
+   - Send newsletters to the submitted emails immediately or on-demand.
+   - Optional: Serve news dynamically to frontend via REST API (instead of using static JSON).
+
+2. **APIs to Implement:**
+   - `POST /subscribe` → accept email input and respond with success/error.
+   - `POST /send-newsletter` → send newsletter to the submitted email(s).
+   - Optional: `GET /news` → serve news articles as JSON.
+
+3. **Email Sending:**
+   - Use an email service (NodeMailer, SendGrid, or SMTP).
+   - Newsletter format should match **professional black-and-white theme** of the frontend.
+   - Include top news headlines and links in the email.
+
+4. **Data Storage:**
+   - No database required. Emails can be stored temporarily in memory or processed immediately.
+
+5. **Tech Stack Recommendations:**
+   - Node.js + Express OR Python + FastAPI
+   - CORS enabled to connect with frontend
+   - Environment variables for email credentials
+
+6. **Additional Requirements:**
+   - Validate email format
+   - Handle errors gracefully
+   - Simple, lightweight, and ready to run
+
+7. **Output Expected from AI:**
+   - Full backend code (Node.js/Express or Python/FastAPI)
+   - Example environment file for email credentials
+   - Instructions to run locally and connect to frontend
