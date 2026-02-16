@@ -44,116 +44,47 @@ const reverseCategoryMap = {
   'general': 'World',
   'health': 'Health',
   'sports': 'Sports',
-  'entertainment': 'Entertainment',
-  'gaming': 'Gaming'
+  'entertainment': 'Entertainment'
 };
 
 async function fetchNewsFromAPI(category = null) {
-  if (category && category !== 'All' && cachedNews[category] && cacheTimestamp && (Date.now() - cacheTimestamp < CACHE_DURATION)) {
-    return cachedNews[category];
-  }
-
   const apiKey = process.env.NEWS_API_KEY;
+  
   if (!apiKey || apiKey === 'your_newsapi_key_here') {
-    console.warn('NEWS_API_KEY not configured, using fallback news');
+    console.log('Using fallback news (no API key configured)');
     return getFallbackNews(category);
   }
 
   try {
-    if (category === 'All' || !category) {
-      const allArticles = [];
-      const apiCategories = ['technology', 'business', 'science', 'entertainment'];
-      
-      for (const cat of apiCategories) {
-        const response = await fetch(
-          `https://newsapi.org/v2/top-headlines?country=us&category=${cat}&apiKey=${apiKey}&pageSize=5`
-        );
-        if (response.ok) {
-          const data = await response.json();
-          allArticles.push(...data.articles.map(article => {
-            const summary = article.content || article.description || 'No description available';
-            const cleanSummary = summary.replace(/\[.*?\]/g, '').slice(0, 300);
-            return {
-              id: 0,
-              headline: article.title || 'No title',
-              summary: cleanSummary || 'No description available',
-              thumbnail: article.urlToImage || 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=250&fit=crop',
-              date: article.publishedAt ? article.publishedAt.split('T')[0] : new Date().toISOString().split('T')[0],
-              category: reverseCategoryMap[cat] || 'Technology',
-              source: article.source.name,
-              url: article.url
-            };
-          }));
-        }
-      }
-      
-      cachedNews = { 'All': allArticles };
-      cacheTimestamp = Date.now();
-      return allArticles;
-    } else if (category === 'Gaming') {
-      const response = await fetch(
-        `https://newsapi.org/v2/everything?q=gaming&sortBy=publishedAt&language=en&pageSize=10&apiKey=${apiKey}`
-      );
-      
-      if (!response.ok) {
-        throw new Error(`NewsAPI error: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      const articles = data.articles.map((article, index) => {
-        const summary = article.content || article.description || 'No description available';
-        const cleanSummary = summary.replace(/\[.*?\]/g, '').slice(0, 300);
-        
-        return {
-          id: index + 1,
-          headline: article.title || 'No title',
-          summary: cleanSummary || 'No description available',
-          thumbnail: article.urlToImage || 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=250&fit=crop',
+    const newsCategory = categoryMap[category] || 'technology';
+    const url = `https://newsapi.org/v2/top-headlines?category=${newsCategory}&country=us&apiKey=${apiKey}`;
+    
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.status === 'ok' && data.articles) {
+      const articles = data.articles
+        .filter(article => article.urlToImage)
+        .map((article, index) => ({
+          id: Date.now() + index,
+          headline: article.title,
+          summary: article.description || article.content || 'No description available',
+          thumbnail: article.urlToImage,
           date: article.publishedAt ? article.publishedAt.split('T')[0] : new Date().toISOString().split('T')[0],
-          category: 'Gaming',
-          source: article.source.name,
-          url: article.url
-        };
-      });
+          category: reverseCategoryMap[category] || category || 'Technology',
+          source: article.source.name
+        }));
       
-      cachedNews[category] = articles;
+      cachedNews[category || 'all'] = articles;
       cacheTimestamp = Date.now();
+      
       return articles;
     } else {
-      const apiCat = categoryMap[category] || 'technology';
-      const response = await fetch(
-        `https://newsapi.org/v2/top-headlines?country=us&category=${apiCat}&apiKey=${apiKey}&pageSize=10`
-      );
-      
-      if (!response.ok) {
-        throw new Error(`NewsAPI error: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      const articles = data.articles.map((article, index) => {
-        const summary = article.content || article.description || 'No description available';
-        const cleanSummary = summary.replace(/\[.*?\]/g, '').slice(0, 300);
-        
-        return {
-          id: index + 1,
-          headline: article.title || 'No title',
-          summary: cleanSummary || 'No description available',
-          thumbnail: article.urlToImage || 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=250&fit=crop',
-          date: article.publishedAt ? article.publishedAt.split('T')[0] : new Date().toISOString().split('T')[0],
-          category: category,
-          source: article.source.name,
-          url: article.url
-        };
-      });
-      
-      cachedNews[category] = articles;
-      cacheTimestamp = Date.now();
-      return articles;
+      console.error('NewsAPI error:', data.message || 'Unknown error');
+      return getFallbackNews(category);
     }
   } catch (error) {
-    console.error('Error fetching news:', error.message);
+    console.error('Failed to fetch from NewsAPI:', error);
     return getFallbackNews(category);
   }
 }
@@ -189,7 +120,7 @@ const newsArticles = [
     headline: "Revolutionary AI Model Breaks New Ground in Natural Language Processing",
     summary: "A groundbreaking artificial intelligence model has achieved unprecedented performance in understanding and generating human language.",
     thumbnail: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=250&fit=crop",
-    date: "2026-02-14",
+    date: "2026-02-15",
     category: "Technology"
   },
   {
@@ -197,7 +128,7 @@ const newsArticles = [
     headline: "Global Markets Rally as Tech Sector Reports Record Earnings",
     summary: "Stock markets worldwide surge following impressive quarterly results from major technology companies.",
     thumbnail: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=250&fit=crop",
-    date: "2026-02-13",
+    date: "2026-02-14",
     category: "Business"
   },
   {
@@ -205,7 +136,7 @@ const newsArticles = [
     headline: "Scientists Discover New Species in Deep Ocean Expedition",
     summary: "Marine biologists have identified several previously unknown species during a deep-sea exploration mission.",
     thumbnail: "https://images.unsplash.com/photo-1551244072-5d12893278ab?w=400&h=250&fit=crop",
-    date: "2026-02-12",
+    date: "2026-02-13",
     category: "Science"
   },
   {
@@ -213,16 +144,56 @@ const newsArticles = [
     headline: "International Climate Summit Reaches Historic Agreement",
     summary: "World leaders commit to ambitious carbon reduction targets in landmark deal.",
     thumbnail: "https://images.unsplash.com/photo-1569163139599-0f4517e36f51?w=400&h=250&fit=crop",
-    date: "2026-02-11",
+    date: "2026-02-12",
     category: "World"
   },
   {
     id: 5,
-    headline: "Viral Innovation: This Startup Just Raised $500M at Unicorn Valuation",
-    summary: "A disruptively innovative startup has secured massive funding in today's competitive venture capital landscape.",
-    thumbnail: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=400&h=250&fit=crop",
+    headline: "New Quantum Computer Achieves Major Breakthrough",
+    summary: "Researchers announce a major milestone in quantum computing, promising faster drug discovery and climate modeling.",
+    thumbnail: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=250&fit=crop",
+    date: "2026-02-11",
+    category: "Technology"
+  },
+  {
+    id: 6,
+    headline: "Electric Vehicle Sales Surpass Traditional Cars for First Time",
+    summary: "EVs now dominate global car sales as consumers shift toward sustainable transportation options.",
+    thumbnail: "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=400&h=250&fit=crop",
     date: "2026-02-10",
-    category: "Trending"
+    category: "Business"
+  },
+  {
+    id: 7,
+    headline: "Space Agency Announces Plans for First Mars Colony",
+    summary: "Ambitious new project aims to establish permanent human presence on Mars within the next decade.",
+    thumbnail: "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=400&h=250&fit=crop",
+    date: "2026-02-09",
+    category: "Science"
+  },
+  {
+    id: 8,
+    headline: "Major Trade Agreement Reshapes Global Economy",
+    summary: "Historic partnership between economic powers promises to boost trade and reduce tariffs worldwide.",
+    thumbnail: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=400&h=250&fit=crop",
+    date: "2026-02-08",
+    category: "World"
+  },
+  {
+    id: 9,
+    headline: "Next-Gen Gaming Console Launches with Revolutionary Features",
+    summary: "The highly anticipated gaming console hits stores with groundbreaking technology and exclusive game titles.",
+    thumbnail: "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=400&h=250&fit=crop",
+    date: "2026-02-07",
+    category: "Gaming"
+  },
+  {
+    id: 10,
+    headline: "AI-Powered Healthcare Diagnostics Transform Patient Care",
+    summary: "Machine learning algorithms now detect diseases earlier and more accurately than ever before.",
+    thumbnail: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&h=250&fit=crop",
+    date: "2026-02-06",
+    category: "Technology"
   }
 ];
 

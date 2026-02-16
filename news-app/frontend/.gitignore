@@ -22,16 +22,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-# Vite cache
-.vite/
-
-# Environment variables
-.env
-backend/.env
-
-# Build cache
-*.cache
-
-# OS junk
-Thumbs.db

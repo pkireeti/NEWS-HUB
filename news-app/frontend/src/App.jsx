@@ -14,7 +14,7 @@ function HomePage() {
   const [news, setNews] = useState([])
   const [loading, setLoading] = useState(true)
 
-  const categories = ['All', 'Technology', 'Business', 'Science', 'World', 'Health']
+  const categories = ['All', 'Technology', 'Business', 'Science', 'World', 'Gaming']
 
   useEffect(() => {
     fetchNews(selectedCategory)
